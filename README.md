@@ -2,7 +2,7 @@
 
 xmlseclibs is a library written in PHP for working with XML Encryption and Signatures.
 
-This project is a fork of [robrichards/xmlseclibs](https://github.com/robrichards/xmlseclibs) and adds support for RSASSA-PSS based XML signature algorithms via usage of the RSA implementation of [phpseclib](http://phpseclib.sourceforge.net/).
+This project is a fork of [robrichards/xmlseclibs](https://github.com/robrichards/xmlseclibs) and adds support for RSASSA-PSS based XML signature algorithms via usage of the RSA implementation of [phpseclib](http://phpseclib.sourceforge.net/). We're using this in our fork of [lightSAML](https://github.com/brain-SCC/lightsaml).
 
 ## Requirements
 
