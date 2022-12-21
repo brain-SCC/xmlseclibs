@@ -6,7 +6,7 @@ This project is a fork of [robrichards/xmlseclibs](https://github.com/robrichard
 
 ## Requirements
 
-xmlseclibs requires PHP version 5.4 or greater. **5.6.24+ recommended for security reasons**
+This xmlseclibs fork requires PHP version 7.0 or greater.
 
 
 ## How to Install
