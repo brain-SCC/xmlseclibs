@@ -13,8 +13,18 @@ This xmlseclibs fork requires PHP version 7.0 or greater.
 
 Install with composer.
 
-```sh
-php composer.phar require "brainscc/xmlseclibs"
+```json
+{
+    "repositories": [
+        {
+            "url": "https://github.com/brain-SCC/xmlseclibs.git",
+            "type": "git"
+        }
+    ],
+    "require": {
+        "brainscc/xmlseclibs": "~3.0"
+    }
+}
 ```
 
 ## Basic usage
