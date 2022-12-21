@@ -60,6 +60,7 @@ class XMLSecEnc
     const Content = 'http://www.w3.org/2001/04/xmlenc#Content';
     const URI = 3;
     const XMLENCNS = 'http://www.w3.org/2001/04/xmlenc#';
+    const XMLDSIGNS = 'http://www.w3.org/2000/09/xmldsig#';
 
     /** @var null|DOMDocument */
     private $encdoc = null;
@@ -390,9 +391,22 @@ class XMLSecEnc
             $query = ".//xmlsecenc:EncryptionMethod";
             $nodeset = $xpath->query($query, $node);
             if ($encmeth = $nodeset->item(0)) {
-                   $attrAlgorithm = $encmeth->getAttribute("Algorithm");
+                $attrAlgorithm = $encmeth->getAttribute("Algorithm");
+                $digestAlgorithm = null;
+
+                if ($attrAlgorithm === XMLSecurityKey::RSA_OAEP)
+                {
+                    $xpath->registerNamespace('dsig', self::XMLDSIGNS);
+                    $query = ".//ds:DigestMethod";
+                    $nodeset = $xpath->query($query, $node);
+                    if ($digmeth = $nodeset->item(0)) {
+                        $digestAlgorithm = $digmeth->getAttribute("Algorithm");
+                        $digestAlgorithm = explode('#', $digestAlgorithm)[1] ?? null;
+                    }
+                }
+
                 try {
-                    $objKey = new XMLSecurityKey($attrAlgorithm, array('type' => 'private'));
+                    $objKey = new XMLSecurityKey($attrAlgorithm, ['type' => 'private', 'digest' => $digestAlgorithm]);
                 } catch (Exception $e) {
                     return null;
                 }

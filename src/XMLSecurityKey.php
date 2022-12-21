@@ -1,14 +1,11 @@
 <?php
 namespace RobRichards\XMLSecLibs;
 
-if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
-    require __DIR__ . '/../vendor/autoload.php';
-}
-
 use DOMElement;
 use Exception;
-use phpseclib\Crypt\RSA;
-use phpseclib\File\X509;
+use phpseclib3\Crypt\RSA\PrivateKey;
+use phpseclib3\Crypt\RSA\PublicKey;
+use phpseclib3\Crypt\RSA;
 
 /**
  * xmlseclibs.php
@@ -187,7 +184,7 @@ class XMLSecurityKey
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
                 $this->cryptParams['method'] = 'http://www.w3.org/2001/04/xmlenc#rsa-1_5';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -199,19 +196,30 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p';
                 $this->cryptParams['hash'] = null;
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
                 }
                 throw new Exception('Certificate "type" (private/public) must be passed via parameters');
+//            case (self::RSA_OAEP):
+//                $this->cryptParams['library'] = 'openssl';
+//                $this->cryptParams['padding'] = OPENSSL_PKCS1_OAEP_PADDING;
+//                $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#rsa-oaep';
+//                $this->cryptParams['hash'] = 'http://www.w3.org/2009/xmlenc11#mgf1sha1';
+//                if (is_array($params) && ! empty($params['type'])) {
+//                    if ($params['type'] === 'public' || $params['type'] === 'private') {
+//                        $this->cryptParams['type'] = $params['type'];
+//                        break;
+//                    }
+//                }
+//                throw new Exception('Certificate "type" (private/public) must be passed via parameters');
             case (self::RSA_OAEP):
-                $this->cryptParams['library'] = 'openssl';
-                $this->cryptParams['padding'] = OPENSSL_PKCS1_OAEP_PADDING;
+                $this->cryptParams['library'] = 'phpseclib';
+                $this->cryptParams['digest'] = $params['digest'] ?? 'sha1';
                 $this->cryptParams['method'] = 'http://www.w3.org/2009/xmlenc11#rsa-oaep';
-                $this->cryptParams['hash'] = 'http://www.w3.org/2009/xmlenc11#mgf1sha1';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -222,7 +230,7 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -234,7 +242,7 @@ class XMLSecurityKey
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
                 $this->cryptParams['digest'] = 'SHA256';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -246,7 +254,7 @@ class XMLSecurityKey
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
                 $this->cryptParams['digest'] = 'SHA384';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -258,7 +266,7 @@ class XMLSecurityKey
                 $this->cryptParams['padding'] = OPENSSL_PKCS1_PADDING;
                 $this->cryptParams['digest'] = 'SHA512';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                         $this->cryptParams['type'] = $params['type'];
                         break;
                     }
@@ -269,17 +277,18 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2007/05/xmldsig-more#sha1-rsa-MGF1';
                 $this->cryptParams['digest'] = 'sha1';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                     $this->cryptParams['type'] = $params['type'];
                     break;
                     }
                 }
+                throw new Exception('Certificate "type" (private/public) must be passed via parameters');
             case (self::SHA224_RSA_MGF1):
                 $this->cryptParams['library'] = 'phpseclib';
                 $this->cryptParams['method'] = 'http://www.w3.org/2007/05/xmldsig-more#sha224-rsa-MGF1';
                 $this->cryptParams['digest'] = 'sha224';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                     $this->cryptParams['type'] = $params['type'];
                     break;
                     }
@@ -290,7 +299,7 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1';
                 $this->cryptParams['digest'] = 'sha256';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                     $this->cryptParams['type'] = $params['type'];
                     break;
                     }
@@ -301,7 +310,7 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2007/05/xmldsig-more#sha384-rsa-MGF1';
                 $this->cryptParams['digest'] = 'sha384';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                     $this->cryptParams['type'] = $params['type'];
                     break;
                     }
@@ -312,7 +321,7 @@ class XMLSecurityKey
                 $this->cryptParams['method'] = 'http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1';
                 $this->cryptParams['digest'] = 'sha512';
                 if (is_array($params) && ! empty($params['type'])) {
-                    if ($params['type'] == 'public' || $params['type'] == 'private') {
+                    if ($params['type'] === 'public' || $params['type'] === 'private') {
                     $this->cryptParams['type'] = $params['type'];
                     break;
                     }
@@ -434,7 +443,7 @@ class XMLSecurityKey
         } else {
             $this->x509Certificate = null;
         }
-        if ($this->cryptParams['library'] == 'openssl') {
+        if ($this->cryptParams['library'] === 'openssl') {
             switch ($this->cryptParams['type']) {
                 case 'public':
 	                if ($isCert) {
@@ -461,26 +470,19 @@ class XMLSecurityKey
                     throw new Exception('Unknown type');
             }
         }
-        if ($this->cryptParams['library'] == 'phpseclib') {
-            switch ($this->cryptParams['type']) {
+        elseif ($this->cryptParams['library'] === 'phpseclib')
+        {
+            switch ($this->cryptParams['type'])
+            {
                 case 'public':
-                    $rsa = new RSA();
-                    if ($isCert) {
-                        $x509 = new X509();
-                        $x509->loadX509($this->key);
-                        $this->key = $x509->getPublicKey();
-                    }
-                    $rsa->loadKey($this->key);
-                    $this->key = $rsa;
+                    $this->key = RSA::load($this->key);
                     break;
                 case 'private':
-                    $rsa = new RSA();
-                    $rsa->loadKey($this->key);
-                    $this->key = $rsa;
+                    $this->key = RSA::load($this->key, (!empty($this->passphrase) ? $this->passphrase : false));
                     break;
                 default:
                     throw new Exception('Unknown type');
-                }
+            }
         }
     }
 
@@ -667,10 +669,15 @@ class XMLSecurityKey
         if (empty($this->key)) {
             throw new Exception('key not set');
         }
-        $rsa = new RSA();
-        $rsa->loadKey($this->key);
-        $rsa->setHash($this->cryptParams['digest']);
-        $rsa->setMGFHash($this->cryptParams['digest']);
+        if ($this->key instanceof PrivateKey)
+        {
+            $rsa = $this->key;
+        }
+        else
+        {
+            $rsa = RSA::load($this->key);
+        }
+        $rsa = $rsa->withHash($this->cryptParams['digest']);
         $signature = $rsa->sign($data);
         if (!$signature) {
             throw new Exception('Failure Signing Data: - ' . $this->cryptParams['digest']);
@@ -722,10 +729,15 @@ class XMLSecurityKey
         if (empty($this->key)) {
             throw new Exception('key not set');
         }
-        $rsa = new RSA();
-        $rsa->loadKey($this->key);
-        $rsa->setHash($this->cryptParams['digest']);
-        $rsa->setMGFHash($this->cryptParams['digest']);
+        if ($this->key instanceof PublicKey)
+        {
+            $rsa = $this->key;
+        }
+        else
+        {
+            $rsa = RSA::load($this->key);
+        }
+        $rsa = $rsa->withHash($this->cryptParams['digest']);
         $verified = $rsa->verify($data, $signature);
         if ($verified) {
             return 1;
@@ -752,6 +764,20 @@ class XMLSecurityKey
                     return $this->encryptPrivate($data);
             }
         }
+        elseif ($this->cryptParams['library'] === 'phpseclib')
+        {
+            if ($this->key instanceof PublicKey)
+            {
+                $rsa = $this->key;
+            }
+            else
+            {
+                $rsa = RSA::load($this->key);
+            }
+
+            $rsa = $rsa->withHash($this->cryptParams['digest']);
+            return $rsa->encrypt($data);
+        }
     }
 
     /**
@@ -771,6 +797,20 @@ class XMLSecurityKey
                 case 'private':
                     return $this->decryptPrivate($data);
             }
+        }
+        elseif ($this->cryptParams['library'] === 'phpseclib')
+        {
+            if ($this->key instanceof PrivateKey)
+            {
+                $rsa = $this->key;
+            }
+            else
+            {
+                $rsa = RSA::load($this->key);
+            }
+
+            $rsa = $rsa->withHash($this->cryptParams['digest']);
+            return $rsa->decrypt($data);
         }
     }
 
