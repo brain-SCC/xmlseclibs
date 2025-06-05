@@ -22,7 +22,7 @@ Install with composer.
         }
     ],
     "require": {
-        "brainscc/xmlseclibs": "~3.3.0"
+        "brainscc/xmlseclibs": "~3.2.1"
     }
 }
 ```
